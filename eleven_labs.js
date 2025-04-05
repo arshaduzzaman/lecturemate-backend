@@ -6,7 +6,7 @@ const generateVoice = async (text) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "xi-api-key": "sk_50005578b7c7c3cb2bc5ccf38ffa06722722337c8fcede8b",
+      "xi-api-key": "sk_fdce45d99e56d3d0316a0722d1762a89c879f25080ae679d",
     },
     body: JSON.stringify({
       text: text,
