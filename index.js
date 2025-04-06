@@ -15,7 +15,18 @@ const {
 const { SYSTEM_PROMPT, PREFIX } = require("./constants");
 
 const app = express();
-app.use(cors());
+// Configure CORS to allow specific origins
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://lecturemate-frontend.vercel.app",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(fileUpload());
 app.use(express.json());
 
