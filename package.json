@@ -18,9 +18,12 @@
     "ffprobe-static": "^3.1.0",
     "fluent-ffmpeg": "^2.1.3",
     "fs": "^0.0.1-security",
+    "jszip": "^3.10.1",
     "openai": "^4.71.1",
     "pdf-parse": "^1.1.1",
+    "pptx-parser": "^1.1.7-beta.9",
     "tmp": "^0.2.3",
+    "xmldom": "^0.6.0",
     "zod": "^3.23.8"
   }
 }

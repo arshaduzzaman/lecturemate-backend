@@ -5,12 +5,13 @@ const express = require("express");
 const fileUpload = require("express-fileupload");
 const pdfParse = require("pdf-parse");
 const cors = require("cors");
+const { extractTextFromPPTX } = require("./pptParser");
 
 const {
   generateResponse,
   generateQuizResponse,
   generateFlashcardsResponse,
-  generateReferencesResponse, // <-- new function
+  generateReferencesResponse,
 } = require("./openai");
 
 const { SYSTEM_PROMPT, PREFIX } = require("./constants");
@@ -51,17 +52,36 @@ function extractJsonFromString(inputString) {
 
 app.post("/extract-text", async (req, res) => {
   if (!req.files || !req.files.pdfFile) {
-    return res.status(400).send("No PDF file uploaded");
+    return res
+      .status(400)
+      .send("No file uploaded. Please upload a PDF or PPTX file.");
   }
   try {
-    // 1) Parse PDF text
-    const data = await pdfParse(req.files.pdfFile.data);
-    const textContent = data.text || "";
+    // Check file type and extract text accordingly
+    const file = req.files.pdfFile;
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    let textContent = "";
 
-    console.log(
-      "[PDF Parse] Extracted text (first 200 chars):",
-      textContent.slice(0, 200)
-    );
+    if (fileExtension === "pdf") {
+      // Extract text from PDF
+      const data = await pdfParse(file.data);
+      textContent = data.text || "";
+      console.log(
+        "[PDF Parse] Extracted text (first 200 chars):",
+        textContent.slice(0, 200)
+      );
+    } else if (fileExtension === "pptx") {
+      // Extract text from PPTX
+      textContent = await extractTextFromPPTX(file.data);
+      console.log(
+        "[PPTX Parse] Extracted text (first 200 chars):",
+        textContent.slice(0, 200)
+      );
+    } else {
+      return res
+        .status(400)
+        .send("Unsupported file format. Please upload a PDF or PPTX file.");
+    }
 
     // 2) Lecture Explanation
     const chat = [
@@ -97,12 +117,12 @@ app.post("/extract-text", async (req, res) => {
       text: gptResponse || "",
       quiz: quizData,
       flashcards: flashcardsData,
-      references: referencesData, // NEW field
+      references: referencesData,
       pdfContent: textContent,
     });
   } catch (error) {
     console.error("[/extract-text] Error:", error);
-    res.status(500).send("Error parsing PDF");
+    res.status(500).send("Error processing file");
   }
 });
 
