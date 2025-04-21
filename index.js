@@ -5,7 +5,7 @@ const express = require("express");
 const fileUpload = require("express-fileupload");
 const pdfParse = require("pdf-parse");
 const cors = require("cors");
-const { extractTextFromPPTX } = require("./pptParser");
+const { extractTextFromPowerPoint } = require("./pptParser");
 
 const {
   generateResponse,
@@ -54,7 +54,7 @@ app.post("/extract-text", async (req, res) => {
   if (!req.files || !req.files.pdfFile) {
     return res
       .status(400)
-      .send("No file uploaded. Please upload a PDF or PPTX file.");
+      .send("No file uploaded. Please upload a PDF, PPT, or PPTX file.");
   }
   try {
     // Check file type and extract text accordingly
@@ -70,17 +70,19 @@ app.post("/extract-text", async (req, res) => {
         "[PDF Parse] Extracted text (first 200 chars):",
         textContent.slice(0, 200)
       );
-    } else if (fileExtension === "pptx") {
-      // Extract text from PPTX
-      textContent = await extractTextFromPPTX(file.data);
+    } else if (fileExtension === "pptx" || fileExtension === "ppt") {
+      // Extract text from PPT/PPTX
+      textContent = await extractTextFromPowerPoint(file.data, fileExtension);
       console.log(
-        "[PPTX Parse] Extracted text (first 200 chars):",
+        `[${fileExtension.toUpperCase()} Parse] Extracted text (first 200 chars):`,
         textContent.slice(0, 200)
       );
     } else {
       return res
         .status(400)
-        .send("Unsupported file format. Please upload a PDF or PPTX file.");
+        .send(
+          "Unsupported file format. Please upload a PDF, PPT, or PPTX file."
+        );
     }
 
     // 2) Lecture Explanation

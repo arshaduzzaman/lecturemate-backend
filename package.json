@@ -22,6 +22,7 @@
     "openai": "^4.71.1",
     "pdf-parse": "^1.1.1",
     "pptx-parser": "^1.1.7-beta.9",
+    "textract": "^2.5.0",
     "tmp": "^0.2.3",
     "xmldom": "^0.6.0",
     "zod": "^3.23.8"
